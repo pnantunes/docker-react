@@ -1,0 +1,22 @@
+version: '3'
+services:
+    web:
+        stdin_open: true # Avoid a bug in create react app that makes it exit when starting with docker compose
+        environment:
+            - CHOKIDAR_USEPOLLING=true # Enable automatic reloading of the React app in Windows
+        build:
+            context: .
+            dockerfile: Dockerfile.dev
+        ports:
+            - '3000:3000'
+        volumes:
+            - /app/node_modules # Do not try to map the node_modules folder to any folder (it doesn't exist in the local machine)
+            - .:/app # Map the app folder inside the container to our current working directory (except node_modules)   
+    tests:
+        build:
+            context: .
+            dockerfile: Dockerfile.dev
+        volumes:
+            - /app/node_modules
+            - .:/app
+        command: ["npm", "run", "test"] # Override the initial command defined in the Dockerfile.dev file
